@@ -22,6 +22,21 @@ def dfs(start):
         if not visited[i]:
             dfs(i)
             visited[i]=True
+            
+def dfs(start):
+    stack = [start]
+    while(stack):
+        n = stack.pop()
+        if visited[n]:
+            continue
+        print(n,end=' ')
+        A = []
+        visited[n] = True
+        for i in lList[n]:
+            if not visited[i]:
+                A.append(i)
+        for a in A[::-1]:
+            stack.append(a)
 
 def bfs(start):
     q=deque([start])
