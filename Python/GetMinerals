@@ -1,0 +1,31 @@
+# https://school.programmers.co.kr/learn/courses/30/lessons/172927#
+def solution(picks, minerals):
+    answer = 0
+    leng = sum(picks)*5
+    minerals = minerals[:leng]
+    if(len(minerals)%5 == 0): leng = len(minerals)//5
+    else: leng = len(minerals)//5+1
+    mineral = []
+    for m in minerals:
+        if(m == "diamond"): mineral.append(100)
+        elif(m == "iron"): mineral.append(30)
+        else: mineral.append(1)
+    bags = []
+    for i in range(1, leng+1):
+        bags.append([sum(mineral[i*5-5:i*5]), i-1])
+    bags = sorted(bags, key = lambda x: -x[0])
+    dic = {"1diamond": 1, "2diamond":5, "3diamond": 25, "1iron": 1, "2iron": 1, "3iron": 5, "1stone": 1, "2stone": 1, "3stone": 1}
+    for b in bags:
+        flag = "0"
+        if(picks[0]>0):
+            picks[0] -= 1
+            flag = "1"
+        elif(picks[1]>0):
+            picks[1] -= 1
+            flag = "2"
+        elif(picks[2]>0):
+            picks[2] -= 1
+            flag = "3"
+        for m in minerals[5*b[1]:5*(b[1]+1)]:
+            answer += dic[flag+m]
+    return answer
