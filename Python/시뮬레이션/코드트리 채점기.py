@@ -1,87 +1,56 @@
 import sys
-import heapq
+from heapq import heappush, heappop
 input = sys.stdin.readline
+INF = int(1e9)
 
-tools = [];
-waiting = {}; waitingS = set(); waitingD = {}
+tools = []; waiting = {}; waitingS = set()
 judging = [] # 스레드 번호 = 시작시간, 도메인
 judgingS = set()
 history = {} # domain = limit
 
 def init(N, url):
     global waiting, waitingS, judging, tools
-    tools = []
-    for i in range(1, N+1):
-        heapq.heappush(tools, i)
+    for i in range(1, N+1): heappush(tools, i)
     judging = [ [] for _ in range(N+1) ]
     domain = url.split("/")[0]
     waiting[domain] = []
-    waiting[domain].append( (1, 0, url) )
-    waitingS.add(url)
+    heappush(waiting[domain], (1, 0, url)); waitingS.add(url)
 
-def putWaiting(time, priority, url):
+def putWaiting(enter, priority, url):
     global waiting, waitingS
     if url in waitingS: return
     domain = url.split("/")[0]
     if domain not in waiting.keys(): waiting[domain] = []
-    heapq.heappush(waiting[domain], (priority, time, url)); waitingS.add(url)
+    heappush(waiting[domain], (priority, enter, url)); waitingS.add(url)
 
 def putJudging(time):
-    global waiting, waitingS, history, judging, tools, waitingD
-    if len(tools) == 0: return
-    tmp = []
-    for domain in waitingD.keys():
-        if domain in judgingS: continue
-        limit = 0
-        if domain in history.keys(): limit = history[domain]
-        while(waitingD[domain]):
-            enter, priority, url = heapq.heappop(waitingD[domain])
-            if len(waiting[domain]) == 0: waiting[domain] = []
-            if limit <= time: heapq.heappush(waiting[domain], (priority, -enter, url))
-            else: heapq.heappush(waitingD[domain], (enter, priority, url)); break
-        if len(waitingD[domain]) == 0: tmp.append(domain)
-    for t in tmp: del(waitingD[t])
-
-    tmp = [float('inf'), float('inf'), ""]
+    global waiting, waitingS, history, judging, tools
+    if len(tools) == 0: return # 쉬고 있는 채점기 없음
+    best_prior = INF; min_enter = INF; best_domain = ''; best_url = ''
     for domain in waiting.keys():
-        if domain in judgingS: continue
-        while(waiting[domain]):
-            priority, enter, url = heapq.heappop(waiting[domain]);
-            limit = 0
-            if domain in history.keys(): limit = history[domain]
-            if limit <= time:
-                if tmp[0] >= priority and tmp[1] > enter:
-                    if tmp[0] != float('inf'): heapq.heappush(waiting[tmp[2].split("/")[0]], (-tmp[1], tmp[0], tmp[2]))
-                    tmp = [priority, enter, url]
-                else:
-                    if domain not in waitingD.keys(): waitingD[domain] = []
-                    heapq.heappush(waitingD[domain], (-enter, priority, url))
-                break
-            else:
-                if domain not in waitingD.keys(): waitingD[domain] = []
-                heapq.heappush(waitingD[domain], (-enter, priority, url))
-    if tmp[0] != float('inf'):
-        priority, enter, url = tmp
-        domain = url.split("/")[0]
-        tool = heapq.heappop(tools)
-        if len(waiting[domain]) == 0: del(waiting[domain])
-        waitingS.remove(url)
-        judging[tool] = [time, domain]; judgingS.add(domain)
-        # print("waiting", waiting)
-        # print(judging, judgingS)
+        if len(waiting[domain]) == 0: continue # 해당 힙이 비었으면 넘어감
+        # 부적절 채점 의심                                             # 현재 채점 진행 중인 도메인
+        if (domain in history.keys() and history[domain] > time) or domain in judgingS: continue
+        priority, enter, url = waiting[domain][0]
+        if priority < best_prior: best_prior = priority; min_enter = enter; best_domain = domain; best_url = url
+        if priority == best_prior and min_enter > enter: best_prior = priority; min_enter = enter; best_domain = domain; best_url = url
+    
+    if best_prior != INF:
+        toolIdx = heappop(tools); heappop(waiting[best_domain]); waitingS.remove(best_url)
+        judging[toolIdx] = [time, best_domain]; judgingS.add(best_domain)
 
 def endJudging(time, idx):
     global judging, history, judgingS, tools
+    # 해당 채점기 채점 안하는 중
     if judging[idx] == []: return
     start, domain = judging[idx]; judging[idx] = []
-    history[domain] = start+3*(time-start)
+    history[domain] = start + 3*(time-start)
     judgingS.remove(domain)
-    heapq.heappush(tools, idx)
-    # print(400, history)
+    heappush(tools, idx)
 
 def main():
     global waiting
-    for _ in range(int(input())): # 5*10^5
+    for _ in range(int(input())):
         order = input().strip().split(" ")
         if order[0] == "100":
             init(int(order[1]), order[2])
@@ -95,7 +64,6 @@ def main():
             endJudging(time, idx)
         else:
             ans = 0
-            for domain in waiting.keys(): ans += len(waiting[domain])
-            for domain in waitingD.keys(): ans += len(waitingD[domain])
+            for key in waiting.keys(): ans += len(waiting[key])
             print(ans)
 main()
