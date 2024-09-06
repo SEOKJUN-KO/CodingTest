@@ -1,19 +1,11 @@
 import sys
+from collections import deque
 input = sys.stdin.readline
-# y: 1-R x: 1-C
-# 가장 위 1 / 가장 아래 R 행
-# 내릴 때 정해진 출구만 가능
-# c열에서 시작 / 출구는 d 방향
 
-
-# 반복
-# 1. 아래로 하강
-# 2. 좌로 회전
-# 3. 우로 회전
-# 1 ...
 UP = 0; RIGHT = 1; DOWN = 2; LEFT = 3
 board = []
 Y, X = 0, 0
+turn = 0
 
 class Gollem:
     def __init__(self, middleY, middleX, d):
@@ -41,7 +33,6 @@ def moveDown(gollem):
     
     middleY, middleX = gollem.middle[0]+1, gollem.middle[1]
     gollem.reposition(middleY, middleX)
-    # print(gollem.middle)
     return True
         
 
@@ -85,50 +76,50 @@ def moveRight(gollem):
 
 def calculate(middleY, middleX):
     global board, Y, X
-    
-
+    que = deque()
+    que.append([middleY, middleX, board[middleY][middleX]])
+    visit = set([]); visit.add((middleY, middleX))
+    cnt = 0
+    dx, dy = [-1, 1, 0, 0], [0, 0, -1, 1]
+    while(que):
+        y, x, m = que.popleft()
+        if cnt < y: cnt = y
+        for i in range(4):
+            ny, nx = y+dy[i], x+dx[i]
+            if not (0 <= ny < Y+3 and 0 <= nx < X): continue
+            if type(m) == type("str") and (ny, nx) not in visit and board[ny][nx] != 0:
+                que.append([ny, nx, board[ny][nx]])
+                visit.add((ny, nx))
+            elif (ny, nx) not in visit and (board[ny][nx] == int(m) or board[ny][nx] == str(m)):
+                que.append([ny, nx, board[ny][nx]])
+                visit.add((ny, nx))
+    return cnt-2
+            
 def moves(c, d):
-    global board, Y, X
+    global board, Y, X, turn
     gollem = Gollem(1, c, d)
-    moveDown(gollem)
-    mode = 0; cnt = 0
-    while(cnt < 3):
-        if mode == 0:
-            move = moveDown(gollem)
-            if not move: mode += 1; cnt += 1
-            else: cnt = 0
-        elif mode == 1:
-            move = moveLeft(gollem)
-            if not move: mode += 1; cnt += 1
-            else: cnt = 0
-        else:
-            move = moveRight(gollem)
-            if not move: mode = 0; cnt += 1
-            else: cnt = 0
+    while(True):
+        if moveDown(gollem): continue
+        if moveLeft(gollem): continue
+        if moveRight(gollem): continue
+        break
     if gollem.middle[0] <= 3: board = [ [0]*X for _ in range(Y+3) ]; return 0
-    for y, x in [gollem.top, gollem.middle, gollem.left, gollem.right, gollem.bottom]:
-        board[y][x] = 1
-    if gollem.direction == UP: board[gollem.top[0]][gollem.top[1]] = 2
-    if gollem.direction == RIGHT: board[gollem.right[0]][gollem.right[1]] = 2
-    if gollem.direction == DOWN: board[gollem.bottom[0]][gollem.bottom[1]] = 2
-    if gollem.direction == LEFT: board[gollem.left[0]][gollem.left[1]] = 2
-    
-    return 0
+    for y, x in [gollem.top, gollem.middle, gollem.left, gollem.right, gollem.bottom]: board[y][x] = turn
+    if gollem.direction == UP: board[gollem.top[0]][gollem.top[1]] = str(turn)
+    if gollem.direction == RIGHT: board[gollem.right[0]][gollem.right[1]] = str(turn)
+    if gollem.direction == DOWN: board[gollem.bottom[0]][gollem.bottom[1]] = str(turn)
+    if gollem.direction == LEFT: board[gollem.left[0]][gollem.left[1]] = str(turn)
+    return calculate(gollem.middle[0], gollem.middle[1])
 
-
-# 바닥 붙으면 이동 끝
-# 출구가 골렘과 붙어있다면, 정령은 이동 가능
-# 골렘의 몸의 일부가 숲을 벗어나면, 골렘 다 지움
-
-# 출력: 정령의 최종 위치의 행 번호의 합
-# 골렘의 몸의 일부가 숲을 벗어난 경우, 더하지 않음
 
 def init():
-    global board, Y, X
+    global board, Y, X, turn
     Y, X, K = map(int, input().split(" "))
     board = [ [0]*X for _ in range(Y+3) ]
-    for _ in range(K):
+    ans = 0
+    for i in range(3, K+3):
+        turn = i
         c, d = map(int, input().split(" "))
-        moves(c-1, d)
-
+        ans += moves(c-1, d)
+    print(ans)
 init()
