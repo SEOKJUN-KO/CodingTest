@@ -2,124 +2,93 @@ import sys
 from collections import deque
 input = sys.stdin.readline
 
-UP = 0; RIGHT = 1; DOWN = 2; LEFT = 3
-board = []
-Y, X = 0, 0
-turn = 0
+top = [-1, 0]; bottom = [1, 0]; left = [0, -1]; right = [0, 1]; mid = [0, 0]
+
+R, C, K = map(int, input().split(" "))
+board = [ [0]*C for _ in range(R+3) ]
 
 class Gollem:
-    def __init__(self, middleY, middleX, d):
-        self.middle = [middleY, middleX]
-        self.top = [middleY-1, middleX]
-        self.bottom = [middleY+1, middleX]
-        self.left = [middleY, middleX-1]
-        self.right = [middleY, middleX+1]
-        self.direction = d
-    def reposition(self, middleY, middleX):
-        self.middle = [middleY, middleX]
-        self.top = [middleY-1, middleX]
-        self.bottom = [middleY+1, middleX]
-        self.left = [middleY, middleX-1]
-        self.right = [middleY, middleX+1]
-
-def moveDown(gollem):
-    global board, Y, X
-    leftDown = [gollem.left[0]+1, gollem.left[1]]
-    bottomDown = [gollem.bottom[0]+1, gollem.bottom[1]]
-    rightDown = [gollem.right[0]+1, gollem.right[1]]
-    for y, x in [leftDown, bottomDown, rightDown]:
-        if not (0 <= x < X and 0 <= y < Y+3): return False
-        if board[y][x] != 0: return False
+    def __init__(self, idx, x, d):
+        global R
+        self.idx = idx
+        self.midX = x
+        self.midY = 1
+        self.direct = d
+    def goDown(self):
+        global R, C, board
+        for d in [[left, bottom], [bottom, bottom], [right, bottom]]:
+            dy, dx = 0, 0
+            for y, x in d: dy += y; dx += x
+            Y, X = self.midY+dy, self.midX+dx
+            if not(0 <= Y < R+3 and 0 <= X < C): return False
+            if board[Y][X] != 0: return False
+        self.midY += 1;
+        return True
+    def rotateLeft(self):
+        global R, C, board
+        for d in [[top, left], [left, left], [bottom, left], [left, left, bottom], [bottom, left, bottom]]:
+            dy, dx = 0, 0
+            for y, x in d: dy += y; dx += x
+            Y, X = self.midY+dy, self.midX+dx
+            if not( 0 <= Y < R+3 and 0 <= X < C): return False
+            if board[Y][X] != 0: return False
+        self.midY += 1; self.midX -= 1;
+        self.direct -= 1;
+        if self.direct == -1: self.direct = 3
+        return True
+    def rotateRight(self):
+        global R, C, board
+        for d in [[top, right], [right, right], [bottom, right], [right, right, bottom], [bottom, right, bottom]]:
+            dy, dx = 0, 0
+            for y, x in d: dy += y; dx += x
+            Y, X = self.midY+dy, self.midX+dx
+            if not( 0 <= Y < R+3 and 0 <= X < C): return False
+            if board[Y][X] != 0: return False
+        self.midY += 1; self.midX += 1;
+        self.direct += 1;
+        if self.direct == 4: self.direct = 0
+        return True
     
-    middleY, middleX = gollem.middle[0]+1, gollem.middle[1]
-    gollem.reposition(middleY, middleX)
-    return True
-        
-
-def moveLeft(gollem):
-    global board, Y, X
-    topLeft = [gollem.top[0], gollem.top[1]-1]
-    leftLeft = [gollem.left[0], gollem.left[1]-1]
-    bottomLeft = [gollem.bottom[0], gollem.bottom[1]-1]
-    leftLeftDown = [gollem.left[0]+1, gollem.left[1]-1]
-    bottomLeftDown = [gollem.bottom[0]+1, gollem.bottom[1]-1]
-    for y, x in [topLeft, leftLeft, bottomLeft, leftLeftDown, bottomLeftDown]:
-        if not (0 <= x < X and 0 <= y < Y+3): return False
-        if board[y][x] != 0: return False
-    
-    middleY, middleX = gollem.middle[0]+1, gollem.middle[1]-1
-    if gollem.direction == UP: gollem.direction = LEFT
-    elif gollem.direction == LEFT: gollem.direction = DOWN
-    elif gollem.direction == DOWN: gollem.direction = RIGHT
-    elif gollem.direction == RIGHT: gollem.direction = UP
-    gollem.reposition(middleY, middleX)
-    return True
-
-def moveRight(gollem):
-    global board, Y, X
-    topRight = [gollem.top[0], gollem.top[1]+1]
-    rightRight = [gollem.right[0], gollem.right[1]+1]
-    bottomRight = [gollem.bottom[0], gollem.bottom[1]+1]
-    rightRightDown = [gollem.right[0]+1, gollem.right[1]+1]
-    bottomRightDown = [gollem.bottom[0]+1, gollem.bottom[1]+1]
-    for y, x in [topRight, rightRight, bottomRight, rightRightDown, bottomRightDown]:
-        if not (0 <= x < X and 0 <= y < Y+3): return False
-        if board[y][x] != 0: return False
-    
-    middleY, middleX = gollem.middle[0]+1, gollem.middle[1]+1
-    if gollem.direction == UP: gollem.direction = RIGHT
-    elif gollem.direction == RIGHT: gollem.direction = DOWN
-    elif gollem.direction == DOWN: gollem.direction = LEFT
-    elif gollem.direction == LEFT: gollem.direction = UP
-    gollem.reposition(middleY, middleX)
-    return True
-
-def calculate(middleY, middleX):
-    global board, Y, X
-    que = deque()
-    que.append([middleY, middleX, board[middleY][middleX]])
-    visit = set([]); visit.add((middleY, middleX))
-    cnt = 0
-    dx, dy = [-1, 1, 0, 0], [0, 0, -1, 1]
-    while(que):
-        y, x, m = que.popleft()
-        if cnt < y: cnt = y
-        for i in range(4):
-            ny, nx = y+dy[i], x+dx[i]
-            if not (0 <= ny < Y+3 and 0 <= nx < X): continue
-            if type(m) == type("str") and (ny, nx) not in visit and board[ny][nx] != 0:
-                que.append([ny, nx, board[ny][nx]])
-                visit.add((ny, nx))
-            elif (ny, nx) not in visit and (board[ny][nx] == int(m) or board[ny][nx] == str(m)):
-                que.append([ny, nx, board[ny][nx]])
-                visit.add((ny, nx))
-    return cnt-2
-            
-def moves(c, d):
-    global board, Y, X, turn
-    gollem = Gollem(1, c, d)
-    while(True):
-        if moveDown(gollem): continue
-        if moveLeft(gollem): continue
-        if moveRight(gollem): continue
-        break
-    if gollem.middle[0] <= 3: board = [ [0]*X for _ in range(Y+3) ]; return 0
-    for y, x in [gollem.top, gollem.middle, gollem.left, gollem.right, gollem.bottom]: board[y][x] = turn
-    if gollem.direction == UP: board[gollem.top[0]][gollem.top[1]] = str(turn)
-    if gollem.direction == RIGHT: board[gollem.right[0]][gollem.right[1]] = str(turn)
-    if gollem.direction == DOWN: board[gollem.bottom[0]][gollem.bottom[1]] = str(turn)
-    if gollem.direction == LEFT: board[gollem.left[0]][gollem.left[1]] = str(turn)
-    return calculate(gollem.middle[0], gollem.middle[1])
-
-
-def init():
-    global board, Y, X, turn
-    Y, X, K = map(int, input().split(" "))
-    board = [ [0]*X for _ in range(Y+3) ]
-    ans = 0
-    for i in range(3, K+3):
-        turn = i
-        c, d = map(int, input().split(" "))
-        ans += moves(c-1, d)
-    print(ans)
-init()
+    def move(self):
+        global R, C, board
+        while(True):
+            if self.goDown(): continue
+            if self.rotateLeft(): continue
+            if self.rotateRight(): continue
+            break
+        if self.midY <= 3:
+            board = [ [0]*C for _ in range(R+3) ]
+            return False
+        else :
+            for dy, dx in [top, left, mid, right, bottom]:
+                Y, X = self.midY+dy, self.midX+dx
+                if self.direct == 0 and [dy, dx] == top: board[Y][X] = -self.idx
+                elif self.direct == 1 and [dy, dx] == right: board[Y][X] = -self.idx
+                elif self.direct == 2 and [dy, dx] == bottom: board[Y][X] = -self.idx
+                elif self.direct == 3 and [dy, dx] == left: board[Y][X] = -self.idx
+                else: board[Y][X] = self.idx
+        return True
+    def calculate(self):
+        global R, C, board
+        que = deque()
+        que.append([self.midY, self.midX, self.idx])
+        visit = set([]); visit.add((self.midY, self.midX))
+        dy, dx = [-1, 1, 0, 0], [0, 0, -1, 1]
+        ret = self.midY
+        while(que):
+            ny, nx, number = que.popleft()
+            for i in range(4):
+                Y, X = ny+dy[i], nx+dx[i]
+                if (Y, X) in visit: continue
+                if not( 0 <= Y < R+3 and 0 <= X < C): continue
+                if (number < 0 or (board[Y][X] == number) or -1*board[Y][X] == number) and board[Y][X] != 0:
+                    que.append([Y, X, board[Y][X]]); visit.add((Y, X))
+                    if ret < Y: ret = Y
+        return ret-2
+ans = 0
+for i in range(2, K+2):
+    c, d = map(int, input().split(" "))
+    gollem = Gollem(i, c-1, d)
+    if gollem.move():
+        ans += gollem.calculate()
+print(ans)
