@@ -5,12 +5,14 @@
 \paperw11900\paperh16840\margl1440\margr1440\vieww29740\viewh15720\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\b\fs72 \cf0 \'b3\'af\'c2\'a5\
+\f0\b\fs72 \cf0 \'bc\'fd\'c0\'da\
+ROUND(3.18, 0) -> 3\
+\
+\'b3\'af\'c2\'a5\
 Date(\'a1\'ae2024-10-16\'a1\'af) -> 2024-10-16 00:00:00\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 Date_Format(\'a1\'ae2024-04-16 00:00:00\'a1\'af, \'a1\'ae%Y-%m-%d\'a1\'af) -> 2024-04-16\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 \
+Date_Format(\'a1\'ae2024-04-16 00:00:00\'a1\'af, \'a1\'ae%Y-%m-%d\'a1\'af) -> 2024-04-16\
+DateDIFF(\'a1\'ae2024-04-16 00:00:00\'a1\'af, \'a1\'ae2024-04-17 00:00:00\'a1\'af) -> 1\
+\
 \'c5\'d7\'c0\'cc\'ba\'ed \'c7\'d5\'c4\'a1\'b1\'e2\
 select * from tmp1 \
 union \
@@ -23,9 +25,17 @@ WITH TMP1 AS (\
 ), TMP2 AS (\
 	\'a1\'a6\
 )\
+-> \'c7\'d1\'b9\'f8 \'bb\'e7\'bf\'eb\'c7\'cf\'b8\'e9 \'bb\'e7\'b6\'f3\'c1\'fc\
 \
 \'b9\'ae\'c0\'da\'bf\'ad\
 CONCAT(\'a1\'aeconcat\'a1\'af, \'a1\'ae-\'a1\'af, \'a1\'aetest\'a1\'af) -> concat-test\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 SUBSTR(\'a1\'ae012345\'a1\'af, 3, 2) -> 23\
-}
+\
+\'c1\'b6\'b0\'c7\'b9\'ae \
+CASE\
+	WHEN \'c1\'b6\'b0\'c71 THEN ~\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 	WHEN \'c1\'b6\'b0\'c72 THEN ~\
+	ELSE ~ END\
+AS \'c0\'cc\'b8\'a7}
