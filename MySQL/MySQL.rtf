@@ -2,22 +2,28 @@
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset129 AppleSDGothicNeo-Bold;}
 {\colortbl;\red255\green255\blue255;}
 {\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww29740\viewh15720\viewkind0
+\paperw11900\paperh16840\margl1440\margr1440\vieww29740\viewh15860\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\b\fs72 \cf0 \'bc\'fd\'c0\'da\
-ROUND(3.18, 0) -> 3\
+ROUND(3.18, 0) -> 3 [ \'b9\'dd\'bf\'c3\'b8\'b2 ]\
+TRUNCATE(3.18, 1) -> 3.1 [ \'b9\'f6\'b8\'b2 ]\
+COUNT( ) \'c1\'d6\'be\'ee\'c1\'f8 \'c1\'b6\'b0\'c7\'bf\'a1 \'c7\'d8\'b4\'e7\'c7\'cf\'b4\'c2 \'c7\'e0 \'bc\'f6\'b8\'a6 \'b0\'e8\'bb\'ea\
+SUM( ) \'c1\'f6\'c1\'a4\'b5\'c8 \'bc\'fd\'c0\'da\'bf\'ad\'c0\'c7 \'b8\'f0\'b5\'e7 \'b0\'aa\'c0\'c7 \'c3\'d1\'c7\'d5 \'b0\'e8\'bb\'ea\
+AVG( ) \'c1\'f6\'c1\'a4\'b5\'c8 \'bc\'fd\'c0\'da\'bf\'ad\'c0\'c7 \'c6\'f2\'b1\'d5 \'b0\'aa\'c0\'bb \'b0\'e8\'bb\'ea\
 \
 \'b3\'af\'c2\'a5\
 Date(\'a1\'ae2024-10-16\'a1\'af) -> 2024-10-16 00:00:00\
-Date_Format(\'a1\'ae2024-04-16 00:00:00\'a1\'af, \'a1\'ae%Y-%m-%d\'a1\'af) -> 2024-04-16\
+Date_Format(\'a1\'ae2024-04-16 00:00:00\'a1\'af, \'a1\'ae%Y-%m-%d %H:%i:%S\'a1\'af) -> 2024-04-16 00:00:00\
 DateDIFF(\'a1\'ae2024-04-16 00:00:00\'a1\'af, \'a1\'ae2024-04-17 00:00:00\'a1\'af) -> 1\
+YEAR()\
+MONTH()\
+DAY\
 \
 \'c5\'d7\'c0\'cc\'ba\'ed \'c7\'d5\'c4\'a1\'b1\'e2\
 select * from tmp1 \
 union \
 select * from tmp2\
-\
 \
 \'c0\'d3\'bd\'c3 \'c5\'d7\'c0\'cc\'ba\'ed\
 WITH TMP1 AS (\
@@ -31,11 +37,11 @@ WITH TMP1 AS (\
 CONCAT(\'a1\'aeconcat\'a1\'af, \'a1\'ae-\'a1\'af, \'a1\'aetest\'a1\'af) -> concat-test\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 SUBSTR(\'a1\'ae012345\'a1\'af, 3, 2) -> 23\
+TRIM( LEADING | TRAILING \'c1\'a6\'b0\'c5\'c7\'d2 \'b9\'ae\'c0\'da FROM \'b9\'ae\'c0\'da\'bf\'ad )\
 \
 \'c1\'b6\'b0\'c7\'b9\'ae \
 CASE\
 	WHEN \'c1\'b6\'b0\'c71 THEN ~\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0 	WHEN \'c1\'b6\'b0\'c72 THEN ~\
+	WHEN \'c1\'b6\'b0\'c72 THEN ~\
 	ELSE ~ END\
 AS \'c0\'cc\'b8\'a7}
