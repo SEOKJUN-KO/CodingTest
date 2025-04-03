@@ -1,0 +1,35 @@
+WITH TRUCK AS (
+    SELECT CAR_ID, DAILY_FEE
+    FROM CAR_RENTAL_COMPANY_CAR
+    WHERE CAR_TYPE = '트럭'
+), HISTORY AS (
+    SELECT
+        CAR_ID,
+        HISTORY_ID,
+        DATEDIFF(END_DATE, START_DATE) + 1 AS DAY
+    FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY
+    WHERE CAR_ID IN (SELECT CAR_ID FROM TRUCK)
+), PAY AS (
+    SELECT
+        HISTORY_ID,
+        DAY,
+        DAILY_FEE * DAY AS TOTAL
+    FROM HISTORY H
+    JOIN TRUCK T ON H.CAR_ID = T.CAR_ID
+), DISCOUNT AS (
+    SELECT
+        discount_rate, duration_type
+    FROM CAR_RENTAL_COMPANY_DISCOUNT_PLAN
+    WHERE CAR_TYPE = '트럭'
+)
+
+SELECT
+    P.HISTORY_ID,
+    CASE
+        WHEN P.DAY >= 90 THEN ROUND(P.TOTAL * (1 - (SELECT discount_rate FROM DISCOUNT WHERE duration_type = '90일 이상') / 100))
+        WHEN P.DAY >= 30 THEN ROUND(P.TOTAL * (1 - (SELECT discount_rate FROM DISCOUNT WHERE duration_type = '30일 이상') / 100))
+        WHEN P.DAY >= 7 THEN ROUND(P.TOTAL * (1 - (SELECT discount_rate FROM DISCOUNT WHERE duration_type = '7일 이상') / 100))
+        ELSE P.TOTAL
+    END AS FEE
+FROM PAY P
+ORDER BY FEE DESC, P.HISTORY_ID DESC;
