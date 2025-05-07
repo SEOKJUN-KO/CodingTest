@@ -1,75 +1,51 @@
-class Queue {
-    constructor() {
-        this.dict = {}
-        this.front = 0
-        this.rear = 0
-    }
-    
-    append(val) {
-        this.dict[this.rear] = val
-        this.rear += 1
-        return 
-    }
+const fs = require("fs");
+const input = fs.readFileSync("/dev/stdin").toString().trim().split("\n");
 
-    popfront() {
-        if (this.front === this.rear) {
-            return [undefined, undefined]
-        }
-        const val = this.dict[this.front]
-        delete(this.dict[this.front])
-        this.front += 1
-        return val
-    }
+// 첫 줄: N(노드 수), M(간선 수)
+const [N, M] = input[0].split(" ").map(Number);
 
-    isEmpty() {
-        if (this.front === this.rear) {
-            return true
-        }
-        return false
-    }
+// 이후 줄: 간선 정보 [a, b, c]
+const arr = input.slice(1).map(line => line.split(" ").map(Number));
+
+// 가중치 기준 오름차순 정렬
+const sortArr = arr.sort((a, b) => {
+  if (a[2] < b[2]) return -1;
+  if (a[2] > b[2]) return 1;
+  return 0;
+});
+
+const parent = Array(N + 1).fill(0);
+for (let i = 1; i <= N; i++) parent[i] = i;
+
+function find(x) {
+  if (x === parent[x]) return x;
+  return parent[x] = find(parent[x]); // 경로 압축 추가
 }
 
-let N = 7;
-const arr = [
-    [1, 2, 3],
-    [1, 3, 2],
-    [3, 2, 1],
-    [2, 5, 2],
-    [3, 4, 4],
-    [7, 3, 6],
-    [5, 1, 5],
-    [1, 6, 2],
-    [6, 4, 1],
-    [6, 5, 3],
-    [4, 5, 3],
-    [6, 7, 4]
-];
+let cnt = 1;
 
-const board = Array.from({length: N+1}, () => Array(N+1).fill(Infinity))
-
-for( let [a, b, c] of arr ){
-    if (board[a][b] > c) {
-        board[a][b] = c
-        board[b][a] = c
-    }
+function union(x, y) {
+  let X = find(x);
+  let Y = find(y);
+  if (X === Y) return false;
+  cnt += 1
+  if (X < Y) parent[Y] = X;
+  else parent[X] = Y;
+  return true;
 }
-const visited = Array.from( {length: N}, ()=> Infinity )
-visited[1] = 0
 
-const que = new Queue()
-que.append([1, 0])
-console.log(visited)
-while(!que.isEmpty()) {
-    const [node, weight] = que.popfront()
-    if (weight > visited[node]) {
-        continue
+let w = 0;
+let last = 0;
+
+
+for (const [a, b, c] of sortArr) {
+  if (union(a, b)) {
+    w += c;
+    last = c;
+    if (cnt === N) {
+        break;
     }
-    for(let i = 1; i < N+1; i++) {
-        const w = board[node][i]
-        if ( visited[i] >= w+weight ) {
-            visited[i] = w+weight
-            que.append([i, visited[i]])
-        }
-    }
+  }
 }
-console.log(visited)
+
+console.log(w - last);
