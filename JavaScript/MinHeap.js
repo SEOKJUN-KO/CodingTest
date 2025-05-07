@@ -1,74 +1,51 @@
 class MinHeap {
     constructor() {
-      this.heap = [];
+      this.nodes = [null]; // 0번 인덱스는 더미
     }
   
-    push(val) {
-      this.heap.push(val);
-      this._bubbleUp();
+    isNotEmpty() {
+      return this.nodes.length > 1;
     }
   
-    pop() {
-      if (this.heap.length === 0) return undefined;
-      if (this.heap.length === 1) return this.heap.pop();
+    heappush(val) {
+      this.nodes.push(val);
+      let index = this.nodes.length - 1;
   
-      const min = this.heap[0];
-      this.heap[0] = this.heap.pop();
-      this._bubbleDown();
-      return min;
-    }
-  
-    peek() {
-      return this.heap[0];
-    }
-  
-    isEmpty() {
-      return this.heap.length === 0;
-    }
-  
-    _bubbleUp() {
-      let index = this.heap.length - 1;
-      const current = this.heap[index];
-  
-      while (index > 0) {
-        const parentIdx = Math.floor((index - 1) / 2);
-        const parent = this.heap[parentIdx];
-  
-        if (current >= parent) break;
-  
-        this.heap[index] = parent;
-        this.heap[parentIdx] = current;
-        index = parentIdx;
+      while (index > 1 && this.nodes[index] < this.nodes[Math.floor(index / 2)]) {
+        [this.nodes[index], this.nodes[Math.floor(index / 2)]] =
+          [this.nodes[Math.floor(index / 2)], this.nodes[index]];
+        index = Math.floor(index / 2);
       }
     }
   
-    _bubbleDown() {
-      let index = 0;
-      const length = this.heap.length;
-      const current = this.heap[0];
+    heappop() {
+      if (!this.isNotEmpty()) return undefined;
   
-      while (true) {
-        const leftIdx = index * 2 + 1;
-        const rightIdx = index * 2 + 2;
-        let swapIdx = null;
+      const out = this.nodes[1];
+      this.nodes[1] = this.nodes[this.nodes.length - 1];
+      this.nodes.pop();
   
-        if (leftIdx < length && this.heap[leftIdx] < current) {
-          swapIdx = leftIdx;
+      let index = 1;
+      while (this.isNotEmpty()) {
+        let left = index * 2;
+        let right = index * 2 + 1;
+        let smallest = index;
+  
+        if (left < this.nodes.length && this.nodes[smallest] > this.nodes[left]) {
+          smallest = left;
         }
-  
-        if (
-          rightIdx < length &&
-          this.heap[rightIdx] < (swapIdx === null ? current : this.heap[leftIdx])
-        ) {
-          swapIdx = rightIdx;
+        if (right < this.nodes.length && this.nodes[smallest] > this.nodes[right]) {
+          smallest = right;
         }
-  
-        if (swapIdx === null) break;
-  
-        this.heap[index] = this.heap[swapIdx];
-        this.heap[swapIdx] = current;
-        index = swapIdx;
+        if (smallest !== index) {
+          [this.nodes[index], this.nodes[smallest]] = [this.nodes[smallest], this.nodes[index]];
+          index = smallest;
+        } else {
+          break;
+        }
       }
+  
+      return out;
     }
   }
   
