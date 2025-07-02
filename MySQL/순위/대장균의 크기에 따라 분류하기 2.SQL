@@ -1,0 +1,24 @@
+WITH TMP AS (
+    SELECT 
+    (
+        RANK () OVER (ORDER BY SIZE_OF_COLONY DESC)
+        / (
+            SELECT COUNT(ID)
+            FROM ECOLI_DATA
+        )
+    ) AS R,
+    ID
+    FROM ECOLI_DATA
+    ORDER BY ID
+)
+
+
+SELECT 
+ID,
+CASE 
+    WHEN R <= 0.25 THEN 'CRITICAL'
+    WHEN R <= 0.5 THEN 'HIGH'
+    WHEN R <= 0.75 THEN 'MEDIUM'
+    ELSE 'LOW'
+END AS COLONY_NAME
+FROM TMP
