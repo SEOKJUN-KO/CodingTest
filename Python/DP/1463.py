@@ -1,15 +1,10 @@
 N = int(input())
-dp = [ 99999999 for _ in range(N+1)]
-dp[1] = 0
+dp = [0] * (N+1)
 
-i = 1
-while(True):
-    for a in [ i+1, i*2, i*3 ]:
-        n = dp[i]+1
-        if a <= N and dp[a] > n:
-            dp[a] = n
-        if a == N:
-            break
-    i += 1
-    if i > N: break
+for i in range(2, N+1):
+    dp[i] = dp[i-1] + 1
+    if i % 2 == 0:
+        dp[i] = min(dp[i], dp[i//2] + 1)
+    if i % 3 == 0:
+        dp[i] = min(dp[i], dp[i//3] + 1)
 print(dp[N])
