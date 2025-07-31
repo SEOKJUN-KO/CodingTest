@@ -1,12 +1,24 @@
 import sys
 input = sys.stdin.readline
-N = int(input())
-color = []
-color.append(list(map(int, input().split())))
-for i in range(1, N):
-    color.append(list(map(int, input().split())))
-    color[i][0] += min(color[i-1][1], color[i-1][2])
-    color[i][1] += min(color[i-1][0], color[i-1][2])
-    color[i][2] += min(color[i-1][0], color[i-1][1])
 
-print(min(color[N-1]))
+def makeBoard(N):
+    board = []
+    for _ in range(N):
+        board.append(list(map(int, input().split(" "))))
+    return board
+
+def calculate(D):
+    for i in range(1, len(D)):
+        for j in range(3):
+            tmp = float('inf')
+            for k in range(3):
+                if j != k and tmp > D[i-1][k]:
+                    tmp = D[i-1][k]
+            D[i][j] += tmp
+    return min(D[-1])
+
+def main():
+    N = int(input())
+    D = makeBoard(N)
+    print(calculate(D))
+main()
