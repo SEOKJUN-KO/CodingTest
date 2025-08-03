@@ -13,6 +13,8 @@ s = set()
 ans = 0
 def backTracking(board, R, C, ny, nx):
     global dy, dx, ans
+    if ans == R*C:
+        return
     for i in range(4):
         Y, X = ny+dy[i], nx+dx[i]
         if 0 <= Y < R and 0 <= X < C and board[Y][X] not in s:
@@ -21,6 +23,8 @@ def backTracking(board, R, C, ny, nx):
             s.remove(board[Y][X])
     if ans < len(s):
         ans = len(s)
+    if ans == R*C:
+        return
 
 
 def main():
