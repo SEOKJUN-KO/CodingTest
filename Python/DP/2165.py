@@ -16,7 +16,6 @@ def DP(arr):
         DP.append([X, A, B])
         if ans < A: ans = A
         if ans < B: ans = B
-    print(DP)
     return ans
 
 def main():
