@@ -12,7 +12,7 @@ def DP(K, coins):
     D[0] = 1
     
     for coin in coins:
-        if coin < K:
+        if coin <= K:
             D[coin] += 1
         for i in range(coin+1, K+1):
             D[i] += D[i-coin]
