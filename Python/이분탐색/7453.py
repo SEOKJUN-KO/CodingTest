@@ -17,7 +17,7 @@ def makeSumArray(arr):
         for d in arr[3]:
             CD.append(c+d)
 
-    CD = sorted(CD) #3초
+    CD = sorted(CD, key=lambda x: x) #3초
     return CD
 
 def calculate(arr, CD):
