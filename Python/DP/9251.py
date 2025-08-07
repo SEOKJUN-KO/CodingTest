@@ -7,7 +7,6 @@ def DP(A, B):
                 for j in range(i-1, -1, -1):
                     m = max(D[j], m)
                 D[i] = m + 1
-        print(D) 
     return D
 
 def main():
