@@ -6,7 +6,6 @@ def DP(arr):
         arr[i] += arr[i-1]
 
 def calculate(arr):
-    print(arr)
     ans = arr[0]
     m = arr[0]
     for a in arr[1:]:
