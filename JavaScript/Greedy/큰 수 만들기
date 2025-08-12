@@ -1,0 +1,86 @@
+// --- Node & List Utilities ---
+class Node {
+  constructor(v) {
+    this.val = v;
+    this.next = null;
+    this.pre = null;
+  }
+}
+
+function buildListFromString(numberStr) {
+  const head = new Node("start");
+  let last = head;
+  for (const ch of numberStr) {
+    const node = new Node(ch);
+    last.next = node;
+    node.pre = last;
+    last = node;
+  }
+  const tail = new Node("end");
+  last.next = tail;
+  tail.pre = last;
+  return { head, tail };
+}
+
+// prev 노드 하나 제거 (센티넬은 제거 안 함)
+function removePrevIfSmaller(cur) {
+  const prev = cur.pre;
+  if (!prev || prev.val === "start") return false;
+  if (prev.val < cur.val) {
+    const pp = prev.pre;
+    pp.next = cur;
+    cur.pre = pp;
+    return true;
+  }
+  return false;
+}
+
+// 리스트를 문자열로 변환 (tail 전까지)
+function listToString(head, tail) {
+  let s = "";
+  let p = head.next;
+  while (p && p !== tail) {
+    s += p.val;
+    p = p.next;
+  }
+  return s;
+}
+
+// tail 쪽에서 n개 제거
+function removeFromEnd(tail, n) {
+  while (n > 0) {
+    const last = tail.pre;
+    if (!last || last.val === "start") break;
+    const pp = last.pre;
+    pp.next = tail;
+    tail.pre = pp;
+    n--;
+  }
+}
+
+// --- Core Greedy ---
+function greedyRemove(head, tail, k) {
+  let removed = 0;
+  let cur = head.next; // 첫 실제 노드
+
+  while (cur && cur !== tail && removed < k) {
+    // 현재 노드 기준으로, 이전이 더 작으면 이전을 제거
+    if (removePrevIfSmaller(cur)) {
+      removed += 1;
+      // 제거 후에도 같은 cur 기준으로 연쇄적으로 더 지울 수 있어,
+      // 여기서는 그대로 cur 유지하여 while 반복으로 한 번 더 비교
+      continue;
+    }
+    // 못 지웠으면 다음으로 진행
+    cur = cur.next;
+  }
+
+  // 남은 k는 뒤에서 제거
+  if (removed < k) removeFromEnd(tail, k - removed);
+}
+
+function solution(number, k) {
+  const { head, tail } = buildListFromString(number);
+  greedyRemove(head, tail, k);
+  return listToString(head, tail);
+}
