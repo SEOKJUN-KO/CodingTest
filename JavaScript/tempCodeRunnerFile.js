@@ -1,2 +1,0 @@
-
-        B = change(B)
