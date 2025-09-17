@@ -6,15 +6,14 @@ def setMeeting(N):
     for _ in range(N):
         S, E = map(int, input().split(" "))
         arr.append([S, E])
-    arr = sorted(arr, key=lambda x: (x[1], -x[0]))
-    print(arr)
+    arr = sorted(arr, key=lambda x: (x[1], x[0]))
     return arr
 
 def calculate(arr):
     cnt = 0
     lastE = 0
     for s, e in arr:
-        if lastE <= s:
+        if lastE <= s: 
             lastE = e
             cnt += 1
     print(cnt)
