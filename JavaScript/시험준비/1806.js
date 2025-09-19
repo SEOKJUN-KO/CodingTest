@@ -5,21 +5,16 @@ function twoPointer(arr, N, S) {
     if ( S <= sum ) { return 1 }
     ans = Number.MAX_VALUE
 
-    while ( s <= e && e < N ) {
-        while( sum < S && e < N-1) {
-            e++
-            sum += arr[e]
-        }
-        if ( e === N-1 && sum < S ) { break } 
-        while(s < e && sum >= S) {
-            if ( sum >= S && e-s+1 < ans ) {
-                ans = e-s+1
-            }
-            if ( ans === 1 ) { return 1 }
-            sum -= arr[s]
-            s++
+    while (true) {
+        if (sum >= S) {
+            ans = Math.min(ans, e - s + 1)
+            sum -= arr[s++]
+        } else {
+            if (e + 1 > N) break
+            sum += arr[++e]
         }
     }
+
 
     return ans
 }
