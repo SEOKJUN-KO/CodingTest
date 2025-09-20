@@ -58,9 +58,11 @@ function addEdges(input, E) {
 
 const P = []
 function getParent(x) {
-    if (P[x] === x) { return x }
-    return getParent(P[x])
+    if (P[x] === x) return x;
+    P[x] = getParent(P[x]); // 경로 압축
+    return P[x];
 }
+
 
 function connect(x, y) {
     const X = getParent(x)
@@ -85,10 +87,10 @@ function calculate(N) {
         P.push(i)
     }
 
-    while(heap.getSize() > 0) {
+    while(heap.getSize() > 0) { // 10^5
         const [C, A, B] = heap.pop()
 
-        if ( connect(A, B) ) {
+        if ( connect(A, B) ) { 
             ans += C
         }
     }
